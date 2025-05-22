@@ -11,6 +11,8 @@ import {
   AlertTriangle,
   Plus,
   FileCode,
+  ArrowDownNarrowWide,
+  ArrowUpNarrowWide,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -209,11 +211,11 @@ export default function GistListPage() {
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon">
+              <Button variant="outline">
                 {sortOrder === "desc" ? (
-                  <SortDesc className="h-4 w-4" />
+                  <ArrowDownNarrowWide className="h-4 w-4" />
                 ) : (
-                  <SortAsc className="h-4 w-4" />
+                  <ArrowUpNarrowWide className="h-4 w-4" />
                 )}
               </Button>
             </DropdownMenuTrigger>
