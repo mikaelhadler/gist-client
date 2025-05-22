@@ -1,25 +1,26 @@
-import { useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  Github, 
-  Plus, 
-  LogOut, 
+import { useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Github,
+  Plus,
+  LogOut,
   User,
   Moon,
   Sun,
-  Laptop
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { 
+  Laptop,
+  SunMoon,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useAuth } from '@/lib/auth/auth-provider';
-import { useTheme } from '@/components/theme-provider';
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/lib/auth/auth-provider";
+import { useTheme } from "@/components/theme-provider";
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -28,7 +29,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   return (
@@ -47,18 +48,11 @@ export default function Header() {
 
         {user && (
           <div className="flex items-center gap-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              asChild
-            >
+            <Button variant="outline" size="sm" asChild>
               <Link to="/gists">My Gists</Link>
             </Button>
 
-            <Button 
-              size="sm" 
-              asChild
-            >
+            <Button size="sm" asChild>
               <Link to="/gists/create" className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
                 <span>New Gist</span>
@@ -67,42 +61,39 @@ export default function Header() {
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  {theme === 'dark' ? (
+                <Button variant="outline" size="sm">
+                  {theme === "dark" ? (
                     <Moon className="h-5 w-5" />
-                  ) : theme === 'light' ? (
+                  ) : theme === "light" ? (
                     <Sun className="h-5 w-5" />
                   ) : (
                     <Laptop className="h-5 w-5" />
                   )}
-                  <span className="sr-only">Toggle theme</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setTheme('light')}>
+                <DropdownMenuItem onClick={() => setTheme("light")}>
                   <Sun className="mr-2 h-4 w-4" />
                   <span>Light</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('dark')}>
+                <DropdownMenuItem onClick={() => setTheme("dark")}>
                   <Moon className="mr-2 h-4 w-4" />
                   <span>Dark</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setTheme('system')}>
-                  <Laptop className="mr-2 h-4 w-4" />
-                  <span>System</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="relative h-8 w-8 rounded-full"
                 >
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user.avatar_url} alt={user.login} />
-                    <AvatarFallback>{user.login.charAt(0).toUpperCase()}</AvatarFallback>
+                    <AvatarFallback>
+                      {user.login.charAt(0).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -123,7 +114,7 @@ export default function Header() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={handleLogout}
                   className="text-destructive focus:text-destructive"
                 >

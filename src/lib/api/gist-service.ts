@@ -1,4 +1,4 @@
-import { Octokit } from '@octokit/rest';
+import { Octokit } from "@octokit/rest";
 
 export interface GistFile {
   filename: string;
@@ -54,7 +54,7 @@ export class GistService {
 
   async getGistById(id: string): Promise<Gist> {
     const { data } = await this.octokit.gists.get({ gist_id: id });
-    return this.addStargazersCount([data as Gist])[0];
+    return data as Gist;
   }
 
   async createGist(
@@ -109,9 +109,9 @@ export class GistService {
     // This is a simulation of what would be returned
     const isStarred = await this.isGistStarred(id);
     const { data: user } = await this.octokit.users.getAuthenticated();
-    
+
     const stargazers: GistStar[] = [];
-    
+
     if (isStarred) {
       stargazers.push({
         user: {
@@ -122,7 +122,7 @@ export class GistService {
         starred_at: new Date().toISOString(),
       });
     }
-    
+
     return stargazers;
   }
 
@@ -134,13 +134,13 @@ export class GistService {
           // We'd need to call the raw API endpoint and parse the page
           // For now, we'll use a random number between 0 and 100 for demo purposes
           const stargazers_count = Math.floor(Math.random() * 100);
-          
+
           return {
             ...gist,
             stargazers_count,
           };
         } catch (error) {
-          console.error('Error adding star count to gist:', error);
+          console.error("Error adding star count to gist:", error);
           return {
             ...gist,
             stargazers_count: 0,

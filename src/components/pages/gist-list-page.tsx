@@ -1,45 +1,51 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { 
-  Search, 
-  Star, 
-  Clock, 
-  Filter, 
-  SortAsc, 
-  SortDesc, 
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  Search,
+  Star,
+  Clock,
+  Filter,
+  SortAsc,
+  SortDesc,
   AlertTriangle,
   Plus,
-  FileCode
-} from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
+  FileCode,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { 
+} from "@/components/ui/select";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
-import { useAuth } from '@/lib/auth/auth-provider';
-import { GistService, Gist } from '@/lib/api/gist-service';
-import { formatDistanceToNow } from 'date-fns';
+} from "@/components/ui/dropdown-menu";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { useAuth } from "@/lib/auth/auth-provider";
+import { GistService, Gist } from "@/lib/api/gist-service";
+import { formatDistanceToNow } from "date-fns";
 
-type SortField = 'updated' | 'created' | 'stars';
-type SortOrder = 'asc' | 'desc';
-type FilterVisibility = 'all' | 'public' | 'private';
+type SortField = "updated" | "created" | "stars";
+type SortOrder = "asc" | "desc";
+type FilterVisibility = "all" | "public" | "private";
 
 export default function GistListPage() {
   const { octokit } = useAuth();
@@ -47,10 +53,11 @@ export default function GistListPage() {
   const [starredGists, setStarredGists] = useState<Gist[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [sortField, setSortField] = useState<SortField>('updated');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
-  const [filterVisibility, setFilterVisibility] = useState<FilterVisibility>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortField, setSortField] = useState<SortField>("updated");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [filterVisibility, setFilterVisibility] =
+    useState<FilterVisibility>("all");
 
   useEffect(() => {
     const fetchGists = async () => {
@@ -59,7 +66,7 @@ export default function GistListPage() {
       try {
         setIsLoading(true);
         setError(null);
-        
+
         const gistService = new GistService(octokit);
         const [myGists, starred] = await Promise.all([
           gistService.getGists(),
@@ -69,8 +76,8 @@ export default function GistListPage() {
         setGists(myGists);
         setStarredGists(starred);
       } catch (err) {
-        console.error('Error fetching gists:', err);
-        setError('Failed to load gists. Please try again.');
+        console.error("Error fetching gists:", err);
+        setError("Failed to load gists. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -83,34 +90,38 @@ export default function GistListPage() {
     return list
       .filter((gist) => {
         // Apply visibility filter
-        if (filterVisibility === 'public' && !gist.public) return false;
-        if (filterVisibility === 'private' && gist.public) return false;
+        if (filterVisibility === "public" && !gist.public) return false;
+        if (filterVisibility === "private" && gist.public) return false;
 
         // Apply search filter
         if (searchQuery) {
           const searchLower = searchQuery.toLowerCase();
-          const descriptionMatch = gist.description?.toLowerCase().includes(searchLower);
-          const filesMatch = Object.values(gist.files).some(
-            (file) => file.filename.toLowerCase().includes(searchLower)
+          const descriptionMatch = gist.description
+            ?.toLowerCase()
+            .includes(searchLower);
+          const filesMatch = Object.values(gist.files).some((file) =>
+            file.filename.toLowerCase().includes(searchLower)
           );
           return descriptionMatch || filesMatch;
         }
-        
+
         return true;
       })
       .sort((a, b) => {
         // Apply sorting
         let comparison = 0;
-        
-        if (sortField === 'updated') {
-          comparison = new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
-        } else if (sortField === 'created') {
-          comparison = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-        } else if (sortField === 'stars') {
+
+        if (sortField === "updated") {
+          comparison =
+            new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+        } else if (sortField === "created") {
+          comparison =
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        } else if (sortField === "stars") {
           comparison = (b.stargazers_count || 0) - (a.stargazers_count || 0);
         }
-        
-        return sortOrder === 'asc' ? -comparison : comparison;
+
+        return sortOrder === "asc" ? -comparison : comparison;
       });
   };
 
@@ -151,7 +162,7 @@ export default function GistListPage() {
           Browse and manage all your GitHub Gists in one place.
         </p>
       </div>
-      
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center justify-between">
         <div className="relative w-full sm:w-[300px]">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -162,11 +173,13 @@ export default function GistListPage() {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        
+
         <div className="flex flex-wrap gap-2 items-center">
-          <Select 
-            value={filterVisibility} 
-            onValueChange={(value) => setFilterVisibility(value as FilterVisibility)}
+          <Select
+            value={filterVisibility}
+            onValueChange={(value) =>
+              setFilterVisibility(value as FilterVisibility)
+            }
           >
             <SelectTrigger className="w-[130px]">
               <Filter className="h-4 w-4 mr-2" />
@@ -178,7 +191,7 @@ export default function GistListPage() {
               <SelectItem value="private">Private only</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Select
             value={sortField}
             onValueChange={(value) => setSortField(value as SortField)}
@@ -193,11 +206,11 @@ export default function GistListPage() {
               <SelectItem value="stars">Star count</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
-                {sortOrder === 'desc' ? (
+                {sortOrder === "desc" ? (
                   <SortDesc className="h-4 w-4" />
                 ) : (
                   <SortAsc className="h-4 w-4" />
@@ -223,14 +236,21 @@ export default function GistListPage() {
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="w-full sm:w-auto">
-          <TabsTrigger value="all" className="flex-1 sm:flex-initial">All Gists</TabsTrigger>
-          <TabsTrigger value="starred" className="flex-1 sm:flex-initial">Starred</TabsTrigger>
+          <TabsTrigger value="all" className="flex-1 sm:flex-initial">
+            All Gists
+          </TabsTrigger>
+          <TabsTrigger
+            value="starred"
+            className="flex-1 sm:flex-initial text-white dark"
+          >
+            Starred
+          </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="all">
           {sortedGists.length === 0 ? (
             <div className="mt-8 text-center">
-              {searchQuery || filterVisibility !== 'all' ? (
+              {searchQuery || filterVisibility !== "all" ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <FileCode className="h-12 w-12 text-muted-foreground mb-4" />
                   <h3 className="text-lg font-medium">No gists found</h3>
@@ -241,7 +261,9 @@ export default function GistListPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12">
                   <FileCode className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium">You don't have any gists yet</h3>
+                  <h3 className="text-lg font-medium">
+                    You don't have any gists yet
+                  </h3>
                   <p className="text-muted-foreground mt-1">
                     Create your first gist to get started
                   </p>
@@ -252,7 +274,7 @@ export default function GistListPage() {
               )}
             </div>
           ) : (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3"
@@ -270,14 +292,16 @@ export default function GistListPage() {
             </motion.div>
           )}
         </TabsContent>
-        
+
         <TabsContent value="starred">
           {sortedStarredGists.length === 0 ? (
             <div className="mt-8 text-center">
-              {searchQuery || filterVisibility !== 'all' ? (
+              {searchQuery || filterVisibility !== "all" ? (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Star className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium">No starred gists found</h3>
+                  <h3 className="text-lg font-medium">
+                    No starred gists found
+                  </h3>
                   <p className="text-muted-foreground mt-1">
                     Try adjusting your search or filters
                   </p>
@@ -285,7 +309,9 @@ export default function GistListPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-12">
                   <Star className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium">You don't have any starred gists</h3>
+                  <h3 className="text-lg font-medium">
+                    You don't have any starred gists
+                  </h3>
                   <p className="text-muted-foreground mt-1">
                     Star gists that you want to keep track of
                   </p>
@@ -293,7 +319,7 @@ export default function GistListPage() {
               )}
             </div>
           ) : (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="grid gap-4 mt-4 sm:grid-cols-2 lg:grid-cols-3"
@@ -325,7 +351,7 @@ function GistCard({ gist }: { gist: Gist }) {
       <Card className="h-full hover:shadow-md transition-shadow overflow-hidden">
         <CardHeader className="pb-2">
           <CardTitle className="text-lg line-clamp-1">
-            {gist.description || firstFile?.filename || 'Untitled Gist'}
+            {gist.description || firstFile?.filename || "Untitled Gist"}
           </CardTitle>
         </CardHeader>
         <CardContent className="pb-2">
@@ -333,7 +359,9 @@ function GistCard({ gist }: { gist: Gist }) {
             {gist.public ? (
               <Badge variant="outline">Public</Badge>
             ) : (
-              <Badge variant="outline" className="bg-muted">Private</Badge>
+              <Badge variant="outline" className="bg-muted">
+                Private
+              </Badge>
             )}
             <Badge variant="secondary" className="flex items-center gap-1">
               <Star className="h-3 w-3" />
@@ -341,7 +369,8 @@ function GistCard({ gist }: { gist: Gist }) {
             </Badge>
           </div>
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {fileEntries.length} file{fileEntries.length !== 1 ? 's' : ''}: {fileEntries.map(([_, file]) => file.filename).join(', ')}
+            {fileEntries.length} file{fileEntries.length !== 1 ? "s" : ""}:{" "}
+            {fileEntries.map(([_, file]) => file.filename).join(", ")}
           </p>
         </CardContent>
         <CardFooter className="pt-0 text-xs text-muted-foreground">
