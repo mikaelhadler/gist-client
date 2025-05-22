@@ -48,10 +48,6 @@ export default function Header() {
 
         {user && (
           <div className="flex items-center gap-4">
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/gists">My Gists</Link>
-            </Button>
-
             <Button size="sm" asChild>
               <Link to="/gists/create" className="flex items-center gap-1">
                 <Plus className="h-4 w-4" />
