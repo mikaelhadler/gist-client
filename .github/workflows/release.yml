@@ -4,31 +4,26 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
 
 jobs:
-  build:
+  release:
     strategy:
       matrix:
-        platform: [macos-latest, ubuntu-latest, windows-latest]
+        platform: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.platform }}
     permissions:
       contents: write
 
     steps:
-      - name: Checkout repo
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22
-
-      - name: Install system dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt update
-          sudo apt install -y libgtk-3-dev libappindicator3-dev libwebkit2gtk-4.0-dev pkg-config build-essential
+          node-version: 18
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -36,13 +31,40 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Setup Rust
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build app
-        run: pnpm tauri build
+      - name: Cache Rust
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
-      - name: Upload artifacts to GitHub Release
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt update
+          sudo apt install -y \
+            libayatana-appindicator3-dev \
+            libglib2.0-dev \
+            pkg-config \
+            build-essential \
+            xdg-utils \
+            wget \
+            libssl-dev
+
+      - name: Build Tauri app
+        run: pnpm tauri build
+        env:
+          TAURI_SKIP_DEVSERVER: true
+          TAURI_ALLOW_WRY: false
+          TAURI_HIDE_DEVTOOLS: true
+          CI: true
+
+      - name: Upload binaries to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
