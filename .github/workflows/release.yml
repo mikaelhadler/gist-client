@@ -33,9 +33,6 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Tauri CLI
-        run: pnpm install -g @tauri-apps/cli
-
       - name: Build app
         run: pnpm tauri build
 
